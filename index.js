@@ -1,9 +1,10 @@
+'use strict';
 const store = {
   items: [
-    { id: cuid(), name: 'apples', checked: false },
-    { id: cuid(), name: 'oranges', checked: false },
-    { id: cuid(), name: 'milk', checked: true },
-    { id: cuid(), name: 'bread', checked: false }
+    { id: cuid(), name: 'apples', edited:false, checked: false },
+    { id: cuid(), name: 'oranges', edited:false, checked: false },
+    { id: cuid(), name: 'milk', edited: false, checked: true },
+    { id: cuid(), name: 'bread', edited: false, checked: false }
   ],
   hideCheckedItems: false
 };
@@ -15,6 +16,14 @@ const generateItemElement = function (item) {
      <span class='shopping-item'>${item.name}</span>
     `;
   }
+  if (item.edited) {
+    itemTitle = `
+  <form class='js-item-edit'>
+    <label for='edit-item'>item name</label>
+    <input type='text' id='edit-item' name='edit-item'>
+  </form>
+    `;
+  }
 
   return `
     <li class='js-item-element' data-item-id='${item.id}'>
@@ -22,6 +31,9 @@ const generateItemElement = function (item) {
       <div class='shopping-item-controls'>
         <button class='shopping-item-toggle js-item-toggle'>
           <span class='button-label'>check</span>
+        </button>
+        <button class='shopping-item-edit js-item-edit'>
+          <span class='button-label'>edit</span>
         </button>
         <button class='shopping-item-delete js-item-delete'>
           <span class='button-label'>delete</span>
@@ -145,6 +157,28 @@ const handleToggleFilterClick = function () {
   });
 };
 
+
+//display form to enter new item title with submit button on same line
+const editShoppingItem = function(){
+  return `
+  <form class='shopping-item'>
+    <label for='edit-item'>item name</label>
+    <input type='text' id='edit-item' name='edit-item'>
+  </form>
+  `;
+};
+
+//calls function to display form
+const handleEditItemsClick = function() {
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    event.preventDefault();
+    let edit = store.items.edited;
+    console.log('ohh so you want to edit?');
+    console.log(edit);
+    render();
+  });
+};
+
 /**
  * This function will be our callback when the
  * page loads. It is responsible for initially 
@@ -160,6 +194,7 @@ const handleShoppingList = function () {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
+  handleEditItemsClick();
 };
 
 // when the page loads, call `handleShoppingList`
