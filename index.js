@@ -1,8 +1,8 @@
 'use strict';
 const store = {
   items: [
-    { id: cuid(), name: 'apples', edited:false, checked: false },
-    { id: cuid(), name: 'oranges', edited:false, checked: false },
+    { id: cuid(), name: 'apples', edited: false, checked: false },
+    { id: cuid(), name: 'oranges', edited: false, checked: false },
     { id: cuid(), name: 'milk', edited: false, checked: true },
     { id: cuid(), name: 'bread', edited: false, checked: false }
   ],
@@ -16,18 +16,15 @@ const generateItemElement = function (item) {
      <span class='shopping-item'>${item.name}</span>
     `;
   }
-  if (item.edited) {
-    itemTitle = `
-  <form class='js-item-edit'>
-    <label for='edit-item'>item name</label>
-    <input type='text' id='edit-item' name='edit-item'>
-  </form>
-    `;
-  }
 
   return `
     <li class='js-item-element' data-item-id='${item.id}'>
-      ${itemTitle}
+      ${!item.edited ? itemTitle: `
+        <form class="js-item-form">
+          <input class="edit-item" name="title" type="text" required value="${item.name}"/>
+          <input type="submit"/>
+        </form>
+      `}
       <div class='shopping-item-controls'>
         <button class='shopping-item-toggle js-item-toggle'>
           <span class='button-label'>check</span>
@@ -157,25 +154,37 @@ const handleToggleFilterClick = function () {
   });
 };
 
-
-//display form to enter new item title with submit button on same line
-const editShoppingItem = function(){
-  return `
-  <form class='shopping-item'>
-    <label for='edit-item'>item name</label>
-    <input type='text' id='edit-item' name='edit-item'>
-  </form>
-  `;
+const updateItemName = function (id, name) {
+  const foundItem = store.items.find(item => item.id === id);
+  foundItem.name = name;
+  foundItem.edited = false;
+  console.log('item was updated');
 };
 
-//calls function to display form
+const toggleEditedItem = function (id) {
+  const foundItem = store.items.find(item => item.id === id);
+  foundItem.edited = true;
+  console.log('edited item is togled')
+};
+
+//when subimit is clicked to add edited item to list
+const handleEditItemsSubmit = function() {
+  $('.js-shopping-list').on('submit', '.js-item-form', event => {
+    event.preventDefault();
+    const id = getItemIdFromElement(event.currentTarget);
+    const newItemName = $('.edit-item').val();
+    updateItemName(id, newItemName);
+    render();
+    console.log('submit is being handled');
+  });
+};
+
+//edit button changes edited property to true!
 const handleEditItemsClick = function() {
   $('.js-shopping-list').on('click', '.js-item-edit', event => {
-    event.preventDefault();
-    //trying change edited property to true
-    //let edit = store.items.edited;
-    console.log('ohh so you want to edit?');
-    console.log(store.items.edited)
+    //event.preventDefault();
+    const id = getItemIdFromElement(event.currentTarget)
+    toggleEditedItem(id);
     render();
   });
 };
@@ -193,9 +202,11 @@ const handleShoppingList = function () {
   render();
   handleNewItemSubmit();
   handleItemCheckClicked();
+  handleEditItemsSubmit();
   handleDeleteItemClicked();
   handleToggleFilterClick();
   handleEditItemsClick();
+  
 };
 
 // when the page loads, call `handleShoppingList`
