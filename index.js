@@ -172,9 +172,10 @@ const editShoppingItem = function(){
 const handleEditItemsClick = function() {
   $('.js-shopping-list').on('click', '.js-item-edit', event => {
     event.preventDefault();
-    let edit = store.items.edited;
+    //trying change edited property to true
+    //let edit = store.items.edited;
     console.log('ohh so you want to edit?');
-    console.log(edit);
+    console.log(store.items.edited)
     render();
   });
 };
